@@ -1,0 +1,95 @@
+"use client"
+
+import { useEffect } from "react"
+import Link from "next/link"
+import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react"
+import { useLocalization } from "../contexts/LocalizationContext"
+
+interface OffCanvasMenuProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape)
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape)
+    }
+  }, [isOpen, onClose])
+
+  const { language } = useLocalization()
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute right-4 top-4 w-80 rounded-xl bg-[#1a1b1e] shadow-lg transform transition-transform duration-300 ease-in-out">
+        {/* User Profile Section */}
+        <div className="p-4 border-b border-gray-800">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-8 h-8 bg-[#2478ff] rounded-full flex items-center justify-center">
+              <span className="text-white font-medium">V</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-white">Hi, Neurarter</div>
+              <div className="text-xs text-gray-400">viogoss@hotmail.com</div>
+            </div>
+            <div className="flex items-center gap-2">{/* O elemento foi removido daqui */}</div>
+          </div>
+        </div>
+
+        {/* Settings Section */}
+        <div className="p-2">
+          {/* Navigation Links */}
+          <Link
+            href="/subscription"
+            className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            <CreditCard size={18} className="text-gray-400" />
+            <span className="text-sm text-gray-200">Manage Subscription</span>
+          </Link>
+
+          <Link
+            href="/settings"
+            className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            <Settings size={18} className="text-gray-400" />
+            <span className="text-sm text-gray-200">Settings</span>
+          </Link>
+
+          <Link
+            href="/learning"
+            className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            <BookOpen size={18} className="text-gray-400" />
+            <span className="text-sm text-gray-200">{language === "pt" ? "Aprendizagem" : "Learning"}</span>
+          </Link>
+
+          <button
+            onClick={() => {
+              // Handle logout
+              console.log("Logging out...")
+            }}
+            className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-red-400"
+          >
+            <LogOut size={18} />
+            <span className="text-sm">Log Out</span>
+          </button>
+        </div>
+
+        {/* Footer */}
+        <div className="p-2 border-t border-gray-800 mt-2">{/* Footer content removed */}</div>
+      </div>
+    </div>
+  )
+}
+
