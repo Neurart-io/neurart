@@ -12,6 +12,7 @@ export function AnimatedBackground() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           opacity: 0.3, // Reduced opacity to ensure content readability
+          loading: "lazy",
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#101010]/80 to-[#101010]" aria-hidden="true" />

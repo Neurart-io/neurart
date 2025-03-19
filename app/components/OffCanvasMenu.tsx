@@ -44,7 +44,6 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
               <div className="text-sm font-medium text-white">Hi, Neurarter</div>
               <div className="text-xs text-gray-400">viogoss@hotmail.com</div>
             </div>
-            <div className="flex items-center gap-2">{/* O elemento foi removido daqui */}</div>
           </div>
         </div>
 
@@ -94,7 +93,7 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-2 border-t border-gray-800 mt-2">{/* Footer content removed */}</div>
+        <div className="p-2 border-t border-gray-800 mt-2"></div>
       </div>
     </div>
   )

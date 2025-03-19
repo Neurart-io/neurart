@@ -1,26 +1,53 @@
+"use client"
+
 import { T } from "./T"
+import { useEffect, useRef, useState } from "react"
 
 interface HeroProps {
   onRegisterClick: () => void
 }
 
 export default function Hero({ onRegisterClick }: HeroProps) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+
+  useEffect(() => {
+    // Carregar o vídeo com um pequeno atraso para evitar problemas de renderização
+    const timer = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.src =
+          "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/freecompress-weep-Mw2yaVzr2HbghDdfms5co5EUL3VThW.mp4"
+        videoRef.current.load()
+
+        // Adicionar evento de carregamento
+        videoRef.current.onloadeddata = () => {
+          setIsVideoLoaded(true)
+        }
+
+        // Iniciar reprodução
+        videoRef.current.play().catch((e) => {
+          console.error("Video play failed:", e)
+        })
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <section className="relative flex flex-col justify-between items-center min-h-[calc(100vh-60px)] sm:min-h-screen overflow-hidden">
       <video
-        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        ref={videoRef}
+        className={`absolute top-0 left-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ${isVideoLoaded ? "opacity-100" : "opacity-0"}`}
         style={{ objectPosition: "center center" }}
         autoPlay
         loop
         muted
         playsInline
       >
-        <source
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/freecompress-weep-Mw2yaVzr2HbghDdfms5co5EUL3VThW.mp4"
-          type="video/mp4"
-        />
-        Your browser does not support the video tag.
+        {/* O src será definido dinamicamente pelo useEffect */}
       </video>
+      {!isVideoLoaded && <div className="absolute top-0 left-0 w-full h-full bg-[#101010] z-0"></div>}
       <div className="relative z-10 flex-1 flex items-center w-full max-w-[1200px] mx-auto">
         <div className="text-center w-full px-4 sm:px-6 lg:px-8">
           <h1

@@ -7,7 +7,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { User, Download, Trash2, Search, Filter, Calendar, SortDesc, ChevronUp } from "lucide-react"
 import { useScrollToTop } from "../hooks/useScrollToTop"
-import OffCanvasMenu from "../components/OffCanvasMenu"
 import { useLocalization } from "../contexts/LocalizationContext"
 
 // Mock data for generated images
@@ -40,7 +39,6 @@ const generateMockImages = (count: number) => {
 export default function MinhasImagensPage() {
   useScrollToTop()
   const { language } = useLocalization()
-  const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false)
   const [images, setImages] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
@@ -215,9 +213,6 @@ export default function MinhasImagensPage() {
           <Link href="/minhas-imagens" className="text-white font-medium hover:text-gray-300 transition-colors">
             {language === "pt" ? "Minhas Imagens" : "My Images"}
           </Link>
-          <Link href="/assinatura" className="text-gray-400 hover:text-gray-300 transition-colors">
-            {language === "pt" ? "Assinatura" : "Subscription"}
-          </Link>
           <Link href="/suporte" className="text-gray-400 hover:text-gray-300 transition-colors">
             {language === "pt" ? "Suporte" : "Support"}
           </Link>
@@ -238,28 +233,15 @@ export default function MinhasImagensPage() {
             </svg>
           </a>
 
-          <button
-            onClick={() => setIsOffCanvasOpen(!isOffCanvasOpen)}
+          <Link
+            href="/settings"
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#242424] text-white hover:bg-[#333333] transition-colors"
           >
             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
               <User size={14} />
             </div>
             <span className="text-sm">My Account</span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="opacity-60"
-            >
-              <path
-                d="M8 8.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm-4.5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -569,8 +551,6 @@ export default function MinhasImagensPage() {
           <ChevronUp size={24} />
         </button>
       )}
-
-      <OffCanvasMenu isOpen={isOffCanvasOpen} onClose={() => setIsOffCanvasOpen(false)} />
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import "./globals.css"
 import { Kode_Mono, Maven_Pro } from "next/font/google"
 import type React from "react"
-import { LocalizationProvider } from "./contexts/LocalizationContext"
 
 const kodeMono = Kode_Mono({
   subsets: ["latin"],
@@ -28,9 +27,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt" className="dark">
-      <body className={`${kodeMono.className} ${mavenPro.className} custom-scrollbar`}>
-        <LocalizationProvider>{children}</LocalizationProvider>
-      </body>
+      <head>
+        {/* Preload critical resources */}
+        <link
+          rel="preload"
+          href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Icon%20Branco-Icu0fjwiD8ffrMcMzvPk9Bmc7nNuHq.png"
+          as="image"
+        />
+      </head>
+      <body className={`${kodeMono.className} ${mavenPro.className} custom-scrollbar`}>{children}</body>
     </html>
   )
 }

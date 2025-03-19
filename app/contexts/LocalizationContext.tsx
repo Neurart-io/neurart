@@ -9,8 +9,10 @@ interface LocalizationContextType {
   setLanguage: (lang: "pt" | "en") => void
 }
 
+const defaultLanguage: "pt" | "en" = "en"
+
 const LocalizationContext = createContext<LocalizationContextType>({
-  language: "en",
+  language: defaultLanguage,
   country: "Unknown",
   setLanguage: () => {},
 })
@@ -19,38 +21,39 @@ export const useLocalization = () => useContext(LocalizationContext)
 
 export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [localization, setLocalization] = useState<Omit<LocalizationContextType, "setLanguage">>({
-    language: "en",
+    language: defaultLanguage,
     country: "Unknown",
   })
 
   useEffect(() => {
-    const storedLanguage = localStorage.getItem("preferredLanguage") as "pt" | "en" | null
+    let storedLanguage: "pt" | "en" | null = null
 
-    fetch("/api/geo")
-      .then((res) => res.json())
-      .then((data) => {
-        const detectedLanguage = data.country === "BR" ? "pt" : "en"
-        const language = storedLanguage || detectedLanguage
-        setLocalization({
-          country: data.country || "Unknown",
-          language: language,
-        })
-        if (!storedLanguage) {
-          localStorage.setItem("preferredLanguage", language)
-        }
-      })
-      .catch(() => {
-        const language = storedLanguage || "en"
-        setLocalization({ country: "Not detected", language: language })
-        if (!storedLanguage) {
-          localStorage.setItem("preferredLanguage", language)
-        }
-      })
+    // Verificar se estamos no navegador antes de acessar localStorage
+    if (typeof window !== "undefined") {
+      storedLanguage = localStorage.getItem("preferredLanguage") as "pt" | "en" | null
+    }
+
+    // Simplificar a detecção de idioma para evitar chamadas de API desnecessárias
+    const browserLanguage = typeof navigator !== "undefined" ? navigator.language : null
+    const detectedLanguage = browserLanguage && browserLanguage.startsWith("pt") ? "pt" : "en"
+
+    const language = storedLanguage || detectedLanguage
+
+    setLocalization({
+      country: "Unknown",
+      language,
+    })
+
+    if (typeof window !== "undefined" && !storedLanguage) {
+      localStorage.setItem("preferredLanguage", language)
+    }
   }, [])
 
   const setLanguage = (lang: "pt" | "en") => {
     setLocalization((prev) => ({ ...prev, language: lang }))
-    localStorage.setItem("preferredLanguage", lang)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("preferredLanguage", lang)
+    }
   }
 
   return (

@@ -1,10 +1,12 @@
 "use client"
 import { T } from "./T"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import RegistrationPopup from "./RegistrationPopup"
 
 export default function CallToAction() {
   const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
 
   const handleOpenRegistration = () => {
     setShowRegistrationPopup(true)
@@ -21,15 +23,42 @@ export default function CallToAction() {
     })
   }
 
+  useEffect(() => {
+    // Carregar o vídeo com um pequeno atraso para evitar problemas de renderização
+    const timer = setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.src =
+          "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Test2-aHSx24zGoJrg1pYKsWg2SguK1CVVHT.webm"
+        videoRef.current.load()
+
+        // Adicionar evento de carregamento
+        videoRef.current.onloadeddata = () => {
+          setIsVideoLoaded(true)
+        }
+
+        // Iniciar reprodução
+        videoRef.current.play().catch((e) => {
+          console.error("Video play failed:", e)
+        })
+      }
+    }, 500) // Atraso maior para este vídeo, já que ele está mais abaixo na página
+
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <section className="py-16 sm:py-20 md:py-24 lg:py-28 relative flex items-center justify-center overflow-hidden">
-      <video className="absolute inset-0 w-full h-full object-cover z-0" autoPlay loop muted playsInline>
-        <source
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Test2-aHSx24zGoJrg1pYKsWg2SguK1CVVHT.webm"
-          type="video/webm"
-        />
-        Your browser does not support the video tag.
+      <video
+        ref={videoRef}
+        className={`absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000 ${isVideoLoaded ? "opacity-100" : "opacity-0"}`}
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        {/* O src será definido dinamicamente pelo useEffect */}
       </video>
+      {!isVideoLoaded && <div className="absolute inset-0 bg-[#101010] z-0"></div>}
       <div className="relative z-10 w-full text-center">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-white leading-tight drop-shadow-lg">
           <T id="cta.title" />
