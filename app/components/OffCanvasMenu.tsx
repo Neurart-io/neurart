@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react"
 import { useLocalization } from "../contexts/LocalizationContext"
+import { T } from "./T"
 
 interface OffCanvasMenuProps {
   isOpen: boolean
@@ -51,11 +52,13 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
         <div className="p-2">
           {/* Navigation Links */}
           <Link
-            href="/subscription"
+            href="/assinatura"
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
           >
             <CreditCard size={18} className="text-gray-400" />
-            <span className="text-sm text-gray-200">Manage Subscription</span>
+            <span className="text-sm text-gray-200">
+              <T id="myAccount.subscription" />
+            </span>
           </Link>
 
           <Link
@@ -63,7 +66,9 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
           >
             <Settings size={18} className="text-gray-400" />
-            <span className="text-sm text-gray-200">Settings</span>
+            <span className="text-sm text-gray-200">
+              <T id="myAccount.settings" />
+            </span>
           </Link>
 
           <Link
@@ -82,7 +87,9 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-red-400"
           >
             <LogOut size={18} />
-            <span className="text-sm">Log Out</span>
+            <span className="text-sm">
+              <T id="myAccount.logout" />
+            </span>
           </button>
         </div>
 

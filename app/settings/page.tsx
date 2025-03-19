@@ -297,6 +297,12 @@ export default function SettingsPage() {
               >
                 {language === "pt" ? "Notificações" : "Notifications"}
               </button>
+              <Link
+                href="/assinatura"
+                className="w-full text-left block px-4 py-2 rounded-md transition-colors text-gray-300 hover:bg-[#242424]"
+              >
+                {language === "pt" ? "Assinatura" : "Subscription"}
+              </Link>
             </nav>
           </div>
 

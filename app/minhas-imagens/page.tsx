@@ -161,6 +161,12 @@ export default function MinhasImagensPage() {
     })
   }
 
+  const calculateMemoryUsage = () => {
+    // Simulando uso de memória baseado no número de imagens (aproximadamente 0.7MB por imagem)
+    const memoryInMB = Math.round(images.length * 0.7)
+    return `${memoryInMB}mb`
+  }
+
   const confirmDelete = () => {
     if (imageToDelete) {
       setImages((prev) => prev.filter((img) => img.id !== imageToDelete))
@@ -209,6 +215,9 @@ export default function MinhasImagensPage() {
           <Link href="/minhas-imagens" className="text-white font-medium hover:text-gray-300 transition-colors">
             {language === "pt" ? "Minhas Imagens" : "My Images"}
           </Link>
+          <Link href="/assinatura" className="text-gray-400 hover:text-gray-300 transition-colors">
+            {language === "pt" ? "Assinatura" : "Subscription"}
+          </Link>
           <Link href="/suporte" className="text-gray-400 hover:text-gray-300 transition-colors">
             {language === "pt" ? "Suporte" : "Support"}
           </Link>
@@ -256,7 +265,18 @@ export default function MinhasImagensPage() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <h1 className="text-2xl font-bold">{language === "pt" ? "Minhas Imagens" : "My Images"}</h1>
+          <div>
+            <h1 className="text-2xl font-bold">{language === "pt" ? "Minhas Imagens" : "My Images"}</h1>
+            {images.length > 0 && (
+              <div className="mt-2 bg-[#181818] px-3 py-1 rounded-md inline-flex items-center text-sm">
+                <span className="font-medium">
+                  {images.length} {language === "pt" ? "imagens" : "images"}
+                </span>
+                <span className="mx-2 text-gray-500">|</span>
+                <span className="text-gray-300">{calculateMemoryUsage()}</span>
+              </div>
+            )}
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative flex-grow">
