@@ -1,55 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Mail } from "lucide-react"
-import { useScrollToTop } from "../hooks/useScrollToTop"
-import { Work_Sans } from "next/font/google"
-import { T } from "../components/T"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Mail } from "lucide-react";
+import { useScrollToTop } from "../hooks/useScrollToTop";
+import { Work_Sans } from "next/font/google";
+import { T } from "../components/T";
+import { useRouter } from "next/navigation";
+import { signup } from "../login/actions";
 
-const workSans = Work_Sans({ subsets: ["latin"] })
+const workSans = Work_Sans({ subsets: ["latin"] });
 
 export default function RegistroPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  useScrollToTop()
+  useScrollToTop();
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Simple validation
     if (!email || !password) {
-      setError("Please fill in all required fields")
-      setIsLoading(false)
-      return
+      setError("Please fill in all required fields");
+      setIsLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate registration process
-    setTimeout(() => {
-      localStorage.setItem("authToken", "demo-token-123")
-      setIsLoading(false)
-      router.push("/gerar-imagem")
-    }, 1500)
-  }
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    signup(formData);
+  };
 
   return (
     <div
@@ -102,12 +102,16 @@ export default function RegistroPage() {
                 <div className="w-full border-t border-gray-800"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-[#101010] text-gray-500 uppercase text-xs font-medium">OR</span>
+                <span className="px-4 bg-[#101010] text-gray-500 uppercase text-xs font-medium">
+                  OR
+                </span>
               </div>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">{error}</div>
+              <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">
+                {error}
+              </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -187,7 +191,10 @@ export default function RegistroPage() {
 
             <p className="mt-8 text-center text-sm text-gray-400">
               <T id="cadastro.possuiConta" />{" "}
-              <Link href="/login" className="font-medium text-[#b157ff] hover:text-[#9645d8]">
+              <Link
+                href="/login"
+                className="font-medium text-[#b157ff] hover:text-[#9645d8]"
+              >
                 <T id="cadastro.entrar" />
               </Link>
             </p>
@@ -203,10 +210,10 @@ export default function RegistroPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/20" /> {/* Subtle overlay */}
+          <div className="absolute inset-0 bg-black/20" />{" "}
+          {/* Subtle overlay */}
         </div>
       </main>
     </div>
-  )
+  );
 }
-

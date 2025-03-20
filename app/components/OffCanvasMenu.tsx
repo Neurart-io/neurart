@@ -1,34 +1,34 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Link from "next/link"
-import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react"
-import { useLocalization } from "../contexts/LocalizationContext"
-import { T } from "./T"
+import { useEffect } from "react";
+import Link from "next/link";
+import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react";
+import { useLocalization } from "../contexts/LocalizationContext";
+import { T } from "./T";
 
 interface OffCanvasMenuProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
+      if (e.key === "Escape") onClose();
+    };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape)
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape)
-    }
-  }, [isOpen, onClose])
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
 
-  const { language } = useLocalization()
+  const { language } = useLocalization();
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -41,7 +41,9 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
               <span className="text-white font-medium">V</span>
             </div>
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Hi, Neurarter</div>
+              <div className="text-sm font-medium text-white">
+                Hi, Neurarter
+              </div>
               <div className="text-xs text-gray-400">viogoss@hotmail.com</div>
             </div>
           </div>
@@ -75,13 +77,15 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
           >
             <BookOpen size={18} className="text-gray-400" />
-            <span className="text-sm text-gray-200">{language === "pt" ? "Aprendizagem" : "Learning"}</span>
+            <span className="text-sm text-gray-200">
+              {language === "pt" ? "Aprendizagem" : "Learning"}
+            </span>
           </Link>
 
           <button
             onClick={() => {
               // Handle logout
-              console.log("Logging out...")
+              console.log("Logging out...");
             }}
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-red-400"
           >
@@ -96,6 +100,5 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
         <div className="p-2 border-t border-gray-800 mt-2"></div>
       </div>
     </div>
-  )
+  );
 }
-
