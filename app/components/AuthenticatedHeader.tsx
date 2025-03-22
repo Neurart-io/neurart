@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { User } from "lucide-react";
@@ -11,15 +11,30 @@ import { useRouter } from "next/navigation";
 
 export default function AuthenticatedHeader() {
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const { language } = useLocalization();
   const router = useRouter();
+  const supabase = createClient();
 
   const handleLogout = async () => {
-    const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
   };
+
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        setUser(user);
+      }
+    };
+    getUser();
+  }, []);
 
   return (
     <>
@@ -116,6 +131,7 @@ export default function AuthenticatedHeader() {
         isOpen={isOffCanvasOpen}
         onClose={() => setIsOffCanvasOpen(false)}
         onLogout={handleLogout}
+        user={user}
       />
     </>
   );

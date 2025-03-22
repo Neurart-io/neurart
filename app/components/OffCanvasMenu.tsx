@@ -10,13 +10,17 @@ interface OffCanvasMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onLogout: () => void;
+  user: any;
 }
 
 export default function OffCanvasMenu({
   isOpen,
   onClose,
   onLogout,
+  user,
 }: OffCanvasMenuProps) {
+  console.log("logged user", user);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -19,25 +19,37 @@ import { Work_Sans } from "next/font/google";
 import { T } from "../components/T";
 import { login } from "./actions";
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 const workSans = Work_Sans({ subsets: ["latin"] });
 
-export default async function LoginPage() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect("/login");
-  }
-
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase.auth.getUser();
+
+        console.log("data", data);
+
+        if (data.user) {
+          console.log("redirecting to /gerar-imagens");
+          router.push("/gerar-imagem");
+        }
+      } catch (err) {
+        console.error("Erro ao verificar autenticação:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkUser();
+  }, [router]);
 
   useScrollToTop();
 
@@ -59,6 +71,14 @@ export default async function LoginPage() {
 
     login(formData);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#101010]">
+        <div className="animate-spin h-8 w-8 border-4 border-[#b157ff] border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div
