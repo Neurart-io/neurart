@@ -17,18 +17,27 @@ import {
 import { useScrollToTop } from "../hooks/useScrollToTop";
 import { Work_Sans } from "next/font/google";
 import { T } from "../components/T";
-import { useRouter } from "next/navigation";
 import { login } from "./actions";
-
+import { createClient } from "@/utils/supabase/client";
+import { redirect } from "next/navigation";
 const workSans = Work_Sans({ subsets: ["latin"] });
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect("/login");
+  }
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
   useScrollToTop();
 

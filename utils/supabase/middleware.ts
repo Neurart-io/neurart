@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Defina as rotas públicas que não precisam de autenticação
 const publicRoutes = [
   "/login",
   "/registro",
@@ -55,7 +54,7 @@ export async function updateSession(request: NextRequest) {
 
   // Verificar se a rota atual está na lista de rotas públicas
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    return supabaseResponse; // Permite acesso sem verificar autenticação
+    return supabaseResponse;
   }
 
   if (
