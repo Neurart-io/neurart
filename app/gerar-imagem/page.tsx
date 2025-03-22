@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Info, User } from "lucide-react";
+import { Info } from "lucide-react";
 import { useScrollToTop } from "../hooks/useScrollToTop";
-import OffCanvasMenu from "../components/OffCanvasMenu";
 import PresetPopup from "../components/PresetPopup";
 import { useLocalization } from "../contexts/LocalizationContext";
 import AuthenticatedHeader from "../components/AuthenticatedHeader";
@@ -43,10 +42,7 @@ export default function GerarImagemPage() {
   const [aspectRatio, setAspectRatio] = useState<string>("1:1");
   const [dimensions, setDimensions] = useState<string>("1024x1024");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  // Always using commands tab since presets tab was removed
   const [activeTab, setActiveTab] = useState("commands");
-  const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const [isPresetPopupOpen, setIsPresetPopupOpen] = useState(false);
   const { language } = useLocalization();
   const [isInfoOverlayOpen, setIsInfoOverlayOpen] = useState(false);
@@ -213,10 +209,7 @@ export default function GerarImagemPage() {
       <style jsx global>
         {customStyles}
       </style>
-      <AuthenticatedHeader
-        onOpenOffCanvas={() => setIsOffCanvasOpen(true)}
-        isOffCanvasOpen={isOffCanvasOpen}
-      />
+      <AuthenticatedHeader />
 
       <div className="flex flex-col md:flex-row h-[calc(100vh-73px)]">
         <div className="w-full md:w-40 bg-[#101010] border-r border-gray-800 flex flex-col">
@@ -610,12 +603,6 @@ export default function GerarImagemPage() {
           </div>
         </div>
       </div>
-      <OffCanvasMenu
-        isOpen={isOffCanvasOpen}
-        onClose={() => setIsOffCanvasOpen(false)}
-      />
-      {/* Now, update the PresetPopup component to pass the new props */}
-      {/* Replace the existing PresetPopup component with this enhanced version: */}
       <PresetPopup
         isOpen={isPresetPopupOpen}
         onClose={() => setIsPresetPopupOpen(false)}

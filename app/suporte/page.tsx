@@ -2,22 +2,15 @@
 
 import type React from "react";
 import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { User } from "lucide-react";
-import { useLocalization } from "../contexts/LocalizationContext";
 import { T } from "../components/T";
-import OffCanvasMenu from "../components/OffCanvasMenu";
 import AuthenticatedHeader from "../components/AuthenticatedHeader";
 
 export default function SupportPage() {
-  const { language } = useLocalization();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +29,7 @@ export default function SupportPage() {
       className="min-h-screen bg-[#101010] text-white"
       style={{ fontFamily: "'Kode Mono', monospace" }}
     >
-      <AuthenticatedHeader
-        onOpenOffCanvas={() => setIsOffCanvasOpen(true)}
-        isOffCanvasOpen={isOffCanvasOpen}
-      />
+      <AuthenticatedHeader />
 
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8 text-center">
@@ -133,10 +123,6 @@ export default function SupportPage() {
           )}
         </div>
       </main>
-      <OffCanvasMenu
-        isOpen={isOffCanvasOpen}
-        onClose={() => setIsOffCanvasOpen(false)}
-      />
     </div>
   );
 }

@@ -9,9 +9,14 @@ import { T } from "./T";
 interface OffCanvasMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onLogout: () => void;
 }
 
-export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
+export default function OffCanvasMenu({
+  isOpen,
+  onClose,
+  onLogout,
+}: OffCanvasMenuProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();

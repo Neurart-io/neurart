@@ -10,13 +10,10 @@ import {
   CheckCircle,
   CreditCard,
   AlertCircle,
-  User,
 } from "lucide-react";
 import { useScrollToTop } from "../hooks/useScrollToTop";
 import { Work_Sans } from "next/font/google";
 import { T } from "../components/T";
-import OffCanvasMenu from "../components/OffCanvasMenu";
-import { useLocalization } from "../contexts/LocalizationContext";
 import AuthenticatedHeader from "../components/AuthenticatedHeader";
 
 const workSans = Work_Sans({ subsets: ["latin"] });
@@ -122,8 +119,6 @@ export default function SubscriptionPage() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
-  const { language } = useLocalization();
   useScrollToTop();
 
   // Formatar data para exibição
@@ -170,10 +165,7 @@ export default function SubscriptionPage() {
       style={{ fontFamily: "'Kode Mono', monospace" }}
     >
       {/* Header simplificado para usuário logado */}
-      <AuthenticatedHeader
-        onOpenOffCanvas={() => setIsOffCanvasOpen(true)}
-        isOffCanvasOpen={isOffCanvasOpen}
-      />
+      <AuthenticatedHeader />
 
       {/* Main Content */}
       <main className={`flex-grow flex flex-col ${workSans.className}`}>
@@ -495,10 +487,6 @@ export default function SubscriptionPage() {
           </div>
         </div>
       </footer>
-      <OffCanvasMenu
-        isOpen={isOffCanvasOpen}
-        onClose={() => setIsOffCanvasOpen(false)}
-      />
     </div>
   );
 }

@@ -7,12 +7,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { User, Eye, EyeOff, Save, Globe, Moon, Sun } from "lucide-react";
 import { useLocalization } from "../contexts/LocalizationContext";
-import OffCanvasMenu from "../components/OffCanvasMenu";
 import AuthenticatedHeader from "../components/AuthenticatedHeader";
 
 export default function SettingsPage() {
   const { language, setLanguage } = useLocalization();
-  const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("account");
 
   // Password change state
@@ -235,10 +233,7 @@ export default function SettingsPage() {
       className="min-h-screen bg-[#101010] text-white"
       style={{ fontFamily: "'Kode Mono', monospace" }}
     >
-      <AuthenticatedHeader
-        onOpenOffCanvas={() => setIsOffCanvasOpen(true)}
-        isOffCanvasOpen={isOffCanvasOpen}
-      />
+      <AuthenticatedHeader />
 
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-8">
@@ -684,11 +679,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
-
-      <OffCanvasMenu
-        isOpen={isOffCanvasOpen}
-        onClose={() => setIsOffCanvasOpen(false)}
-      />
     </div>
   );
 }
