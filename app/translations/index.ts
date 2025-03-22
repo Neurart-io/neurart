@@ -390,6 +390,17 @@ export const translations = {
     cancel: "Cancelar",
     confirm: "Confirmar",
     "pricing.bestValue": "Melhor valor",
+
+    // Registration Success
+    "registration.success.title": "Registro concluído!",
+    "registration.success.message":
+      "Obrigado por se registrar. Enviamos um e-mail de confirmação para o endereço fornecido. Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta.",
+    "registration.success.emailSent": "E-mail enviado para:",
+    "registration.success.resend": "Reenviar e-mail de confirmação",
+    "registration.success.resending": "Reenviando...",
+    "registration.success.resendSuccess": "E-mail reenviado com sucesso!",
+    "registration.success.close": "Fechar",
+    "registration.success.login": "Ir para Login",
   },
   en: {
     // Header
@@ -792,6 +803,17 @@ export const translations = {
     cancel: "Cancel",
     confirm: "Confirm",
     "pricing.bestValue": "Best value",
+
+    // Registration Success
+    "registration.success.title": "Registration Complete!",
+    "registration.success.message":
+      "Thank you for registering. We've sent a confirmation email to the address you provided. Please check your inbox and click the link to activate your account.",
+    "registration.success.emailSent": "Email sent to:",
+    "registration.success.resend": "Resend confirmation email",
+    "registration.success.resending": "Resending...",
+    "registration.success.resendSuccess": "Email resent successfully!",
+    "registration.success.close": "Close",
+    "registration.success.login": "Go to Login",
   },
 }
 

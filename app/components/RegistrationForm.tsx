@@ -3,14 +3,20 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { T } from "./T"
+import RegistrationSuccess from "./RegistrationSuccess"
 
-export default function RegistrationForm() {
+interface RegistrationFormProps {
+  onLoginClick?: () => void
+}
+
+export default function RegistrationForm({ onLoginClick }: RegistrationFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isFormStarted, setIsFormStarted] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(false)
 
   useEffect(() => {
     setIsFormStarted(email.trim() !== "" || password.trim() !== "" || confirmPassword.trim() !== "")
@@ -39,6 +45,18 @@ export default function RegistrationForm() {
       setIsLoading(false)
       // Handle successful registration
     }, 1500)
+  }
+
+  const handleCloseSuccess = () => {
+    // Reset form
+    setEmail("")
+    setPassword("")
+    setConfirmPassword("")
+    setIsRegistered(false)
+  }
+
+  if (isRegistered) {
+    return <RegistrationSuccess email={email} onClose={handleCloseSuccess} onLogin={onLoginClick} />
   }
 
   return (

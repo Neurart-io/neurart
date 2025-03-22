@@ -133,7 +133,7 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
               </>
             )}
 
-            {formType === "register" && <RegistrationForm />}
+            {formType === "register" && <RegistrationForm onLoginClick={() => toggleForm("login")} />}
             {formType === "login" && <LoginForm />}
             {formType === "forgotPassword" && <ForgotPasswordForm />}
 
