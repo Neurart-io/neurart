@@ -7,14 +7,32 @@ import { User } from "lucide-react";
 import { useLocalization } from "@/app/contexts/LocalizationContext";
 import OffCanvasMenu from "./OffCanvasMenu";
 import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function AuthenticatedHeader() {
   const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { language } = useLocalization();
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
+
+  // Função para obter a primeira letra do email do usuário
+  const getUserInitial = () => {
+    if (user && user.email && user.email.length > 0) {
+      return user.email[0].toUpperCase();
+    }
+    return "U"; // Fallback
+  };
+
+  // Verificação segura do avatar
+  const hasAvatar =
+    user &&
+    user.user_metadata &&
+    user.user_metadata.avatar_url &&
+    user.user_metadata.avatar_url.length > 0;
+
+  const avatarUrl = hasAvatar ? user.user_metadata.avatar_url : null;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -35,6 +53,11 @@ export default function AuthenticatedHeader() {
     };
     getUser();
   }, []);
+
+  // Função auxiliar para determinar se um link está ativo
+  const isLinkActive = (href: string) => {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <>
@@ -59,19 +82,31 @@ export default function AuthenticatedHeader() {
         <nav className="hidden md:flex space-x-8">
           <Link
             href="/gerar-imagem"
-            className="text-white font-medium hover:text-gray-300 transition-colors"
+            className={`${
+              isLinkActive("/gerar-imagem")
+                ? "text-white font-medium"
+                : "text-gray-400"
+            } hover:text-gray-300 transition-colors`}
           >
             {language === "pt" ? "Renderizar" : "Render"}
           </Link>
           <Link
             href="/minhas-imagens"
-            className="text-gray-400 hover:text-gray-300 transition-colors"
+            className={`${
+              isLinkActive("/minhas-imagens")
+                ? "text-white font-medium"
+                : "text-gray-400"
+            } hover:text-gray-300 transition-colors`}
           >
             {language === "pt" ? "Minhas Imagens" : "My Images"}
           </Link>
           <Link
             href="/suporte"
-            className="text-gray-400 hover:text-gray-300 transition-colors"
+            className={`${
+              isLinkActive("/suporte")
+                ? "text-white font-medium"
+                : "text-gray-400"
+            } hover:text-gray-300 transition-colors`}
           >
             {language === "pt" ? "Suporte" : "Support"}
           </Link>
@@ -106,9 +141,24 @@ export default function AuthenticatedHeader() {
             onClick={() => setIsOffCanvasOpen(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#242424] text-white hover:bg-[#333333] transition-colors"
           >
-            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-              <User size={14} />
-            </div>
+            {/* Avatar do usuário ou inicial do email */}
+            {avatarUrl ? (
+              <div className="w-6 h-6 rounded-full overflow-hidden">
+                <Image
+                  src={avatarUrl}
+                  alt="User avatar"
+                  width={24}
+                  height={24}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-[#2478ff] flex items-center justify-center">
+                <span className="text-white font-medium text-xs">
+                  {getUserInitial()}
+                </span>
+              </div>
+            )}
             <span className="text-sm">My Account</span>
             <svg
               width="16"
