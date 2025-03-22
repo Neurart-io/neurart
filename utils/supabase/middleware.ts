@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Rotas que não precisam de autenticação
 const publicRoutes = [
   "/login",
   "/registro",
@@ -9,7 +10,12 @@ const publicRoutes = [
   "/",
 ];
 
+// Rotas protegidas que requerem autenticação
+const protectedRoutes = ["/gerar-imagem", "/minhas-imagens", "/suporte"];
+
 export async function updateSession(request: NextRequest) {
+  console.log("🔐 Middleware executando para:", request.nextUrl.pathname);
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -42,35 +48,46 @@ export async function updateSession(request: NextRequest) {
   // issues with users being randomly logged out.
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    console.log(
+      "🧑 Status do usuário:",
+      user ? "Autenticado" : "Não autenticado"
+    );
 
-  const { pathname } = request.nextUrl;
+    const { pathname } = request.nextUrl;
 
-  if (!user && !publicRoutes.some((route) => pathname.startsWith(route))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
+    // Verifica se é uma rota pública
+    const isPublicRoute = publicRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
+    console.log("📍 Rota pública?", isPublicRoute);
 
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+    // Verifica se é uma rota protegida
+    const isProtectedRoute =
+      protectedRoutes.some((route) => pathname.startsWith(route)) ||
+      !publicRoutes.some((route) => pathname.startsWith(route));
+    console.log("🛡️ Rota protegida?", isProtectedRoute);
+
+    // Redireciona para login se o usuário não está autenticado e tenta acessar rota protegida
+    if (!user && isProtectedRoute) {
+      console.log(
+        "⚠️ Usuário não autenticado tentando acessar rota protegida. Redirecionando para login."
+      );
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    console.log("✅ Acesso permitido");
+    return supabaseResponse;
+  } catch (error) {
+    console.error("❌ Erro no middleware:", error);
+
+    // Em caso de erro, permita o acesso para evitar bloqueios completos do site
     return supabaseResponse;
   }
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
-  return supabaseResponse;
 }

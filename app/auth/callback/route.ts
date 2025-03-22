@@ -5,30 +5,47 @@ import { createClient } from "@/utils/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/gerar-imagem";
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    console.log("error", error);
-    if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      console.log("isLocalEnv", isLocalEnv);
-      console.log("forwardedHost", forwardedHost);
+  // Debug
+  console.log(
+    "🔑 Callback recebido com código:",
+    code ? "presente" : "ausente"
+  );
 
-      if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}/gerar-imagem`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
-    }
+  if (!code) {
+    console.error("❌ Código de autenticação não encontrado");
+    return NextResponse.redirect(`${origin}/login?error=no_code`);
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  try {
+    const supabase = await createClient();
+
+    // Troca o código por uma sessão
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      console.error("❌ Erro na troca do código por sessão:", error);
+      return NextResponse.redirect(
+        `${origin}/login?error=${encodeURIComponent(error.message)}`
+      );
+    }
+
+    // Obter usuário para verificar se a sessão foi criada com sucesso
+    const { data: userData } = await supabase.auth.getUser();
+
+    if (!userData.user) {
+      console.error("❌ Usuário não encontrado após troca de código");
+      return NextResponse.redirect(`${origin}/login?error=user_not_found`);
+    }
+
+    console.log("✅ Autenticação bem-sucedida para:", userData.user.email);
+
+    // Adiciona um parâmetro de timestamp para evitar cache
+    const timestamp = Date.now();
+    return NextResponse.redirect(`${origin}${next}?auth_success=${timestamp}`);
+  } catch (err) {
+    console.error("❌ Erro no processamento do callback:", err);
+    return NextResponse.redirect(`${origin}/login?error=internal_error`);
+  }
 }

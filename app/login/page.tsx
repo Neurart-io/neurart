@@ -28,12 +28,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const supabase = createClient();
         const { data, error } = await supabase.auth.getUser();
 
         console.log("data", data);
@@ -49,19 +50,19 @@ export default function LoginPage() {
       }
     };
     checkUser();
-  }, [router]);
+  }, [router, supabase.auth]);
 
   useScrollToTop();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
+    setIsLoginLoading(true);
 
     // Simple validation
     if (!email || !password) {
-      setError("Please enter both email and password");
-      setIsLoading(false);
+      setError("Por favor, preencha email e senha");
+      setIsLoginLoading(false);
       return;
     }
 
@@ -69,7 +70,40 @@ export default function LoginPage() {
     formData.append("email", email);
     formData.append("password", password);
 
-    login(formData);
+    login(formData)
+      .catch((err) => {
+        setError("Erro ao fazer login. Verifique suas credenciais.");
+        console.error("Erro no login:", err);
+      })
+      .finally(() => {
+        setIsLoginLoading(false);
+      });
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoginLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+        console.error("Erro ao fazer login com Google:", error);
+      }
+    } catch (err) {
+      setError("Erro ao conectar com Google. Tente novamente.");
+      console.error("Erro de autenticação com Google:", err);
+    } finally {
+      setIsLoginLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -199,12 +233,12 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoginLoading}
                 className={`w-full bg-[#b157ff] text-white py-2 px-4 rounded-md hover:bg-[#9645d8] transition-colors duration-300 ${
-                  isLoading ? "opacity-70 cursor-not-allowed" : ""
+                  isLoginLoading ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
-                {isLoading ? (
+                {isLoginLoading ? (
                   <span className="flex items-center justify-center">
                     <svg
                       className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
@@ -245,10 +279,15 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <button className="w-full flex justify-center items-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-[#181818] text-sm font-medium text-gray-300 hover:bg-[#242424]">
+            <div className="mt-6">
+              {/* Google button */}
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={isLoginLoading}
+                className="w-full flex justify-center items-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-[#181818] text-sm font-medium text-gray-300 hover:bg-[#242424] transition-colors"
+              >
                 <svg
-                  className="h-5 w-5"
+                  className="h-5 w-5 mr-2"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
@@ -272,25 +311,6 @@ export default function LoginPage() {
                 </svg>
                 <span className="ml-2">
                   <T id="login.google" />
-                </span>
-              </button>
-              <button className="w-full flex justify-center items-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-[#181818] text-sm font-medium text-gray-300 hover:bg-[#242424]">
-                <svg
-                  className="h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
-                </svg>
-                <span className="ml-2">
-                  <T id="login.apple" />
-                </span>
-              </button>
-              <button className="w-full flex justify-center items-center py-2 px-4 border border-gray-700 rounded-md shadow-sm bg-[#181818] text-sm font-medium text-gray-300 hover:bg-[#242424]">
-                <Mail size={20} />
-                <span className="ml-2">
-                  <T id="login.emailButton" />
                 </span>
               </button>
             </div>

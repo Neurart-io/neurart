@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Mail, X } from "lucide-react";
+import { Mail, X, CheckCircle, AlertCircle } from "lucide-react";
 import { T } from "./T";
 import { Work_Sans } from "next/font/google";
 import RegistrationForm from "./RegistrationForm";
@@ -17,12 +17,14 @@ interface RegistrationPopupProps {
 }
 
 type FormType = "register" | "login" | "forgotPassword";
+type MessageType = "success" | "error" | null;
 
 export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
   const [formType, setFormType] = useState<FormType>("register");
   const [isVisible, setIsVisible] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<MessageType>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -37,7 +39,8 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
 
   const toggleForm = (type: FormType) => {
     setFormType(type);
-    setErrorMessage("");
+    setMessage("");
+    setMessageType(null);
   };
 
   const handleClose = () => {
@@ -63,10 +66,12 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        setMessage(error.message);
+        setMessageType("error");
       }
     } catch (err) {
-      setErrorMessage("Erro ao conectar com Google. Tente novamente.");
+      setMessage("Erro ao conectar com Google. Tente novamente.");
+      setMessageType("error");
       console.error("Erro de autenticação com Google:", err);
     }
   };
@@ -80,7 +85,8 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        setMessage(error.message);
+        setMessageType("error");
         return false;
       }
 
@@ -90,7 +96,8 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       router.refresh();
       return true;
     } catch (err) {
-      setErrorMessage("Erro ao fazer login. Verifique suas credenciais.");
+      setMessage("Erro ao fazer login. Verifique suas credenciais.");
+      setMessageType("error");
       console.error("Erro de login:", err);
       return false;
     }
@@ -108,16 +115,19 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        setMessage(error.message);
+        setMessageType("error");
         return false;
       }
 
       // Sucesso - mostrar mensagem e mudar para tela de login
-      setErrorMessage("Verifique seu email para confirmar o cadastro!");
+      setMessage("Verifique seu email para confirmar o cadastro!");
+      setMessageType("success");
       toggleForm("login");
       return true;
     } catch (err) {
-      setErrorMessage("Erro ao criar conta. Tente novamente.");
+      setMessage("Erro ao criar conta. Tente novamente.");
+      setMessageType("error");
       console.error("Erro de registro:", err);
       return false;
     }
@@ -131,17 +141,20 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       });
 
       if (error) {
-        setErrorMessage(error.message);
+        setMessage(error.message);
+        setMessageType("error");
         return false;
       }
 
       // Sucesso
-      setErrorMessage(
+      setMessage(
         "Email de recuperação enviado! Verifique sua caixa de entrada."
       );
+      setMessageType("success");
       return true;
     } catch (err) {
-      setErrorMessage("Erro ao solicitar recuperação de senha.");
+      setMessage("Erro ao solicitar recuperação de senha.");
+      setMessageType("error");
       console.error("Erro de recuperação de senha:", err);
       return false;
     }
@@ -191,16 +204,29 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
               />
             </h2>
 
-            {/* Mensagem de erro ou sucesso */}
-            {errorMessage && (
+            {/* Mensagem de feedback - com estilos diferentes para sucesso e erro */}
+            {message && (
               <div
-                className={`mb-4 p-3 rounded-md text-sm ${
-                  errorMessage.includes("Verifique")
-                    ? "bg-green-900/50 border border-green-700 text-white"
-                    : "bg-red-900/50 border border-red-700 text-white"
+                className={`mb-6 p-4 rounded-lg text-sm flex items-start gap-3 ${
+                  messageType === "success"
+                    ? "bg-green-900/30 border border-green-700 text-white"
+                    : "bg-red-900/30 border border-red-700 text-white"
                 }`}
               >
-                {errorMessage}
+                {messageType === "success" ? (
+                  <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  {message}
+                  {messageType === "success" && formType === "login" && (
+                    <p className="mt-1 text-green-300 text-xs">
+                      Antes de fazer login, confirme seu email clicando no link
+                      que enviamos.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
@@ -249,6 +275,7 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
               </>
             )}
 
+            {/* Formulários */}
             {formType === "register" && (
               <RegistrationForm
                 onLoginClick={() => toggleForm("login")}
