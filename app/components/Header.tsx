@@ -67,12 +67,12 @@ export default function Header({ onRegisterClick }: HeaderProps) {
           >
             {language === "pt" ? "EN" : "PT"}
           </button>
-          <button
-            onClick={onRegisterClick}
+          <Link
+            href="/registro"
             className="text-sm sm:text-[15px] bg-white text-black font-bold px-4 py-2 rounded-full hover:bg-gray-200 transition-colors duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white active:bg-gray-300 relative z-50"
           >
             <T id="register" />
-          </button>
+          </Link>
         </nav>
       </div>
     </header>

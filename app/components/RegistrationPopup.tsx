@@ -120,10 +120,16 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
         return false;
       }
 
-      // Sucesso - mostrar mensagem e mudar para tela de login
-      setMessage("Verifique seu email para confirmar o cadastro!");
+      // Sucesso - mostrar mensagem, mudar para tela de login e exibir tooltip
+      setMessage(
+        "Enviamos um email de confirmação para você! Por favor, verifique sua caixa de entrada."
+      );
       setMessageType("success");
       toggleForm("login");
+
+      // Mostrar uma notificação de toast
+      showEmailConfirmationToast(email);
+
       return true;
     } catch (err) {
       setMessage("Erro ao criar conta. Tente novamente.");
@@ -131,6 +137,52 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       console.error("Erro de registro:", err);
       return false;
     }
+  };
+
+  // Adicione esta função para mostrar o tooltip/toast
+  const showEmailConfirmationToast = (email: string) => {
+    // Criar elemento toast
+    const toast = document.createElement("div");
+    toast.className =
+      "fixed top-4 right-4 bg-green-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-start max-w-md transform transition-all duration-500 translate-x-full";
+
+    // Adicionar o conteúdo do toast
+    toast.innerHTML = `
+      <div class="mr-3 flex-shrink-0">
+        <svg class="h-6 w-6 text-green-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div>
+        <p class="font-bold">Email enviado!</p>
+        <p class="text-sm">Enviamos um link de confirmação para ${email.substring(
+          0,
+          3
+        )}...${email.split("@")[1]}</p>
+        <p class="text-sm mt-1">Confirme seu email para acessar sua conta.</p>
+      </div>
+      <button class="ml-auto -mr-1 text-green-300 hover:text-white" onclick="this.parentElement.remove()">
+        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    `;
+
+    // Adicionar ao body
+    document.body.appendChild(toast);
+
+    // Animar entrada
+    setTimeout(() => {
+      toast.classList.remove("translate-x-full");
+      toast.classList.add("translate-x-0");
+    }, 100);
+
+    // Remover após 8 segundos
+    setTimeout(() => {
+      toast.classList.add("translate-x-full");
+      toast.classList.add("opacity-0");
+      setTimeout(() => toast.remove(), 500);
+    }, 8000);
   };
 
   // Função para recuperação de senha
@@ -222,8 +274,8 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
                   {message}
                   {messageType === "success" && formType === "login" && (
                     <p className="mt-1 text-green-300 text-xs">
-                      Antes de fazer login, confirme seu email clicando no link
-                      que enviamos.
+                      Você precisa confirmar seu email antes de fazer login.
+                      Verifique sua caixa de entrada e spam.
                     </p>
                   )}
                 </div>
