@@ -19,8 +19,6 @@ export default function OffCanvasMenu({
   onLogout,
   user,
 }: OffCanvasMenuProps) {
-  console.log("logged user", user);
-
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -53,7 +51,7 @@ export default function OffCanvasMenu({
               <div className="text-sm font-medium text-white">
                 Hi, Neurarter
               </div>
-              <div className="text-xs text-gray-400">viogoss@hotmail.com</div>
+              <div className="text-xs text-gray-400">{user.email}</div>
             </div>
           </div>
         </div>
@@ -93,8 +91,7 @@ export default function OffCanvasMenu({
 
           <button
             onClick={() => {
-              // Handle logout
-              console.log("Logging out...");
+              onLogout();
             }}
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-red-400"
           >
