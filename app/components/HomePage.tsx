@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Header from "./Header"
-import Hero from "./Hero"
-import FeatureOverview from "./FeatureOverview"
-import ModelShowcase from "./ModelShowcase"
-import NoCensorship from "./NoCensorship"
-import CallToAction from "./CallToAction"
-import Footer from "./Footer"
-import { ScrollAnimatedSection } from "./ScrollAnimatedSection"
-import RegistrationPopup from "./RegistrationPopup"
+import { useState } from "react";
+import Header from "./Header";
+import Hero from "./Hero";
+import FeatureOverview from "./FeatureOverview";
+import ModelShowcase from "./ModelShowcase";
+import NoCensorship from "./NoCensorship";
+import CallToAction from "./CallToAction";
+import Footer from "./Footer";
+import { ScrollAnimatedSection } from "./ScrollAnimatedSection";
+import RegistrationPopup from "./RegistrationPopup";
 
 export default function HomePage() {
-  const [showRegistrationPopup, setShowRegistrationPopup] = useState(false)
+  const [showRegistrationPopup, setShowRegistrationPopup] = useState(false);
 
   const handleOpenRegistration = () => {
-    setShowRegistrationPopup(true)
-  }
+    setShowRegistrationPopup(true);
+  };
 
   const handleCloseRegistration = () => {
-    setShowRegistrationPopup(false)
-  }
+    setShowRegistrationPopup(false);
+  };
 
   return (
-    <main className="min-h-screen flex flex-col" style={{ fontFamily: "'Kode Mono', monospace" }}>
+    <main
+      className="min-h-screen flex flex-col"
+      style={{ fontFamily: "'Kode Mono', monospace" }}
+    >
       <Header onRegisterClick={handleOpenRegistration} />
       <Hero onRegisterClick={handleOpenRegistration} />
       <FeatureOverview />
@@ -34,11 +37,12 @@ export default function HomePage() {
         <NoCensorship />
       </ScrollAnimatedSection>
       <ScrollAnimatedSection direction="right">
-        <CallToAction onRegisterClick={handleOpenRegistration} />
+        <CallToAction />
       </ScrollAnimatedSection>
       <Footer />
-      {showRegistrationPopup && <RegistrationPopup onClose={handleCloseRegistration} />}
+      {showRegistrationPopup && (
+        <RegistrationPopup onClose={handleCloseRegistration} />
+      )}
     </main>
-  )
+  );
 }
-

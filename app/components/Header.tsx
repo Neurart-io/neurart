@@ -1,39 +1,39 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { useLocalization } from "../contexts/LocalizationContext"
-import { T } from "./T"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useLocalization } from "../contexts/LocalizationContext";
+import { T } from "./T";
 
 interface HeaderProps {
-  onRegisterClick: () => void
+  onRegisterClick: () => void;
 }
 
 export default function Header({ onRegisterClick }: HeaderProps) {
-  const [scrolled, setScrolled] = useState(false)
-  const router = useRouter()
-  const { language, setLanguage } = useLocalization()
+  const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
+  const { language, setLanguage } = useLocalization();
 
   useEffect(() => {
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 10
+      const isScrolled = window.scrollY > 10;
       if (isScrolled !== scrolled) {
-        setScrolled(isScrolled)
+        setScrolled(isScrolled);
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [scrolled])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [scrolled]);
 
   const toggleLanguage = () => {
-    setLanguage(language === "en" ? "pt" : "en")
-  }
+    setLanguage(language === "en" ? "pt" : "en");
+  };
 
   return (
     <header
@@ -52,19 +52,15 @@ export default function Header({ onRegisterClick }: HeaderProps) {
               className="object-contain"
               priority
             />
-            <span className="ml-2 sm:ml-3 text-white text-base sm:text-lg">Neurart.io</span>
+            <span className="ml-2 sm:ml-3 text-white text-base sm:text-lg">
+              Neurart.io
+            </span>
             <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 sm:py-1 text-xs font-semibold text-white bg-[#2478ff] rounded-full">
               Beta
             </span>
           </Link>
         </div>
         <nav className="flex items-center space-x-2 sm:space-x-4">
-          <Link
-            href="/gerar-imagem"
-            className="text-sm sm:text-[15px] text-white font-bold px-4 py-2 rounded-full hover:bg-white/10 transition-colors duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
-          >
-            <T id="generateImage.generate" />
-          </Link>
           <button
             onClick={toggleLanguage}
             className="text-sm sm:text-[15px] text-white font-bold px-2 py-1 rounded-full hover:bg-white/10 transition-colors duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
@@ -80,6 +76,5 @@ export default function Header({ onRegisterClick }: HeaderProps) {
         </nav>
       </div>
     </header>
-  )
+  );
 }
-
