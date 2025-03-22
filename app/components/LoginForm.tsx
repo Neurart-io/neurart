@@ -1,43 +1,51 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { T } from "./T"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { T } from "./T";
 
-export default function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFormStarted, setIsFormStarted] = useState(false)
+interface LoginFormProps {
+  onLogin: (email: string, password: string) => Promise<boolean>;
+}
+
+export default function LoginForm({ onLogin }: LoginFormProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFormStarted, setIsFormStarted] = useState(false);
 
   useEffect(() => {
-    setIsFormStarted(email.trim() !== "" || password.trim() !== "")
-  }, [email, password])
+    setIsFormStarted(email.trim() !== "" || password.trim() !== "");
+  }, [email, password]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Simple validation
     if (!email || !password) {
-      setError("Please enter both email and password")
-      setIsLoading(false)
-      return
+      setError("Please enter both email and password");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false)
-      // Handle successful login
-    }, 1500)
-  }
+    try {
+      await onLogin(email, password);
+    } catch (err) {
+      setError("Erro ao fazer login. Verifique suas credenciais.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       {error && (
-        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">{error}</div>
+        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">
+          {error}
+        </div>
       )}
       <div>
         <input
@@ -71,7 +79,10 @@ export default function LoginForm() {
             type="checkbox"
             className="h-4 w-4 text-[#b157ff] focus:ring-[#b157ff] border-gray-700 rounded bg-[#181818]"
           />
-          <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+          <label
+            htmlFor="remember-me"
+            className="ml-2 block text-sm text-gray-300"
+          >
             <T id="login.lembrar" />
           </label>
         </div>
@@ -84,8 +95,8 @@ export default function LoginForm() {
             isLoading
               ? "opacity-70 cursor-not-allowed bg-[#181818] text-white border-gray-700"
               : isFormStarted
-                ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
-                : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
+              ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
+              : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
           }`}
         >
           {isLoading ? (
@@ -96,7 +107,14 @@ export default function LoginForm() {
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
@@ -111,6 +129,5 @@ export default function LoginForm() {
         </button>
       </div>
     </form>
-  )
+  );
 }
-

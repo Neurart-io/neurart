@@ -1,68 +1,84 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { T } from "./T"
-import RegistrationSuccess from "./RegistrationSuccess"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { T } from "./T";
+import RegistrationSuccess from "./RegistrationSuccess";
 
 interface RegistrationFormProps {
-  onLoginClick?: () => void
+  onLoginClick: () => void;
+  onRegister: (email: string, password: string) => Promise<boolean>;
 }
 
-export default function RegistrationForm({ onLoginClick }: RegistrationFormProps) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFormStarted, setIsFormStarted] = useState(false)
-  const [isRegistered, setIsRegistered] = useState(false)
+export default function RegistrationForm({
+  onLoginClick,
+  onRegister,
+}: RegistrationFormProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFormStarted, setIsFormStarted] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
-    setIsFormStarted(email.trim() !== "" || password.trim() !== "" || confirmPassword.trim() !== "")
-  }, [email, password, confirmPassword])
+    setIsFormStarted(
+      email.trim() !== "" ||
+        password.trim() !== "" ||
+        confirmPassword.trim() !== ""
+    );
+  }, [email, password, confirmPassword]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Simple validation
     if (!email || !password) {
-      setError("Please fill in all required fields")
-      setIsLoading(false)
-      return
+      setError("Please fill in all required fields");
+      setIsLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false)
-      // Handle successful registration
-    }, 1500)
-  }
+    try {
+      await onRegister(email, password);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCloseSuccess = () => {
     // Reset form
-    setEmail("")
-    setPassword("")
-    setConfirmPassword("")
-    setIsRegistered(false)
-  }
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setIsRegistered(false);
+  };
 
   if (isRegistered) {
-    return <RegistrationSuccess email={email} onClose={handleCloseSuccess} onLogin={onLoginClick} />
+    return (
+      <RegistrationSuccess
+        email={email}
+        onClose={handleCloseSuccess}
+        onLogin={onLoginClick}
+      />
+    );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       {error && (
-        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">{error}</div>
+        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">
+          {error}
+        </div>
       )}
       <div>
         <input
@@ -108,8 +124,8 @@ export default function RegistrationForm({ onLoginClick }: RegistrationFormProps
             isLoading
               ? "opacity-70 cursor-not-allowed bg-[#181818] text-white border-gray-700"
               : isFormStarted
-                ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
-                : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
+              ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
+              : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
           }`}
         >
           {isLoading ? (
@@ -120,7 +136,14 @@ export default function RegistrationForm({ onLoginClick }: RegistrationFormProps
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
@@ -135,6 +158,5 @@ export default function RegistrationForm({ onLoginClick }: RegistrationFormProps
         </button>
       </div>
     </form>
-  )
+  );
 }
-

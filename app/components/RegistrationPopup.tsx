@@ -1,46 +1,147 @@
-"use client"
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Mail, X } from "lucide-react"
-import { T } from "./T"
-import { Work_Sans } from "next/font/google"
-import RegistrationForm from "./RegistrationForm"
-import LoginForm from "./LoginForm"
-import ForgotPasswordForm from "./ForgotPasswordForm"
+"use client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Mail, X } from "lucide-react";
+import { T } from "./T";
+import { Work_Sans } from "next/font/google";
+import RegistrationForm from "./RegistrationForm";
+import LoginForm from "./LoginForm";
+import ForgotPasswordForm from "./ForgotPasswordForm";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
-const workSans = Work_Sans({ subsets: ["latin"] })
+const workSans = Work_Sans({ subsets: ["latin"] });
 
 interface RegistrationPopupProps {
-  onClose: () => void
+  onClose: () => void;
 }
 
-type FormType = "register" | "login" | "forgotPassword"
+type FormType = "register" | "login" | "forgotPassword";
 
 export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
-  const [formType, setFormType] = useState<FormType>("register")
-  const [isVisible, setIsVisible] = useState(false)
-  const [isClosing, setIsClosing] = useState(false)
+  const [formType, setFormType] = useState<FormType>("register");
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
-    document.body.style.overflow = "hidden"
-    const timer = setTimeout(() => setIsVisible(true), 50)
+    document.body.style.overflow = "hidden";
+    const timer = setTimeout(() => setIsVisible(true), 50);
     return () => {
-      clearTimeout(timer)
-      document.body.style.overflow = "visible"
-    }
-  }, [])
+      clearTimeout(timer);
+      document.body.style.overflow = "visible";
+    };
+  }, []);
 
   const toggleForm = (type: FormType) => {
-    setFormType(type)
-  }
+    setFormType(type);
+    setErrorMessage("");
+  };
 
   const handleClose = () => {
-    setIsClosing(true)
+    setIsClosing(true);
     setTimeout(() => {
-      setIsVisible(false)
-      onClose()
-    }, 300)
-  }
+      setIsVisible(false);
+      onClose();
+    }, 300);
+  };
+
+  // Função para autenticação com Google
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } catch (err) {
+      setErrorMessage("Erro ao conectar com Google. Tente novamente.");
+      console.error("Erro de autenticação com Google:", err);
+    }
+  };
+
+  // Função para login com email/senha
+  const handleEmailSignIn = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        return false;
+      }
+
+      // Sucesso - fechar o popup e redirecionar
+      handleClose();
+      router.push("/gerar-imagem");
+      router.refresh();
+      return true;
+    } catch (err) {
+      setErrorMessage("Erro ao fazer login. Verifique suas credenciais.");
+      console.error("Erro de login:", err);
+      return false;
+    }
+  };
+
+  // Função para registro com email/senha
+  const handleEmailSignUp = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        return false;
+      }
+
+      // Sucesso - mostrar mensagem e mudar para tela de login
+      setErrorMessage("Verifique seu email para confirmar o cadastro!");
+      toggleForm("login");
+      return true;
+    } catch (err) {
+      setErrorMessage("Erro ao criar conta. Tente novamente.");
+      console.error("Erro de registro:", err);
+      return false;
+    }
+  };
+
+  // Função para recuperação de senha
+  const handlePasswordReset = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?reset=true`,
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        return false;
+      }
+
+      // Sucesso
+      setErrorMessage(
+        "Email de recuperação enviado! Verifique sua caixa de entrada."
+      );
+      return true;
+    } catch (err) {
+      setErrorMessage("Erro ao solicitar recuperação de senha.");
+      console.error("Erro de recuperação de senha:", err);
+      return false;
+    }
+  };
 
   return (
     <div
@@ -49,12 +150,17 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
       }`}
       style={{ display: isVisible ? "flex" : "none" }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-md" onClick={handleClose}></div>
+      <div
+        className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-md"
+        onClick={handleClose}
+      ></div>
       <div
         className={`bg-[#101010] rounded-3xl overflow-hidden w-[90%] max-w-[1200px] max-h-[90vh] flex ${
           workSans.className
         } relative shadow-2xl shadow-purple-500/20 transition-all duration-300 ${
-          isVisible && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
+          isVisible && !isClosing
+            ? "scale-100 opacity-100"
+            : "scale-90 opacity-0"
         }`}
       >
         {/* Close button */}
@@ -75,18 +181,34 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
                   formType === "register"
                     ? "cadastro.titulo"
                     : formType === "login"
-                      ? "login.titulo"
-                      : "forgotPassword.title"
+                    ? "login.titulo"
+                    : "forgotPassword.title"
                 }
               />
             </h2>
+
+            {/* Mensagem de erro ou sucesso */}
+            {errorMessage && (
+              <div
+                className={`mb-4 p-3 rounded-md text-sm ${
+                  errorMessage.includes("Verifique")
+                    ? "bg-green-900/50 border border-green-700 text-white"
+                    : "bg-red-900/50 border border-red-700 text-white"
+                }`}
+              >
+                {errorMessage}
+              </div>
+            )}
 
             {formType !== "forgotPassword" && (
               <>
                 {/* Auth Buttons */}
                 <div className="space-y-2 mb-3">
                   {/* Google button */}
-                  <button className="w-full flex items-center py-2 px-3 rounded-lg bg-[#181818] text-sm text-white hover:bg-[#242424] transition-colors duration-300 border border-gray-800 h-10">
+                  <button
+                    onClick={handleGoogleSignIn}
+                    className="w-full flex items-center py-2 px-3 rounded-lg bg-[#181818] text-sm text-white hover:bg-[#242424] transition-colors duration-300 border border-gray-800 h-10"
+                  >
                     <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
@@ -108,34 +230,33 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
                     Google
                   </button>
 
-                  {/* Email button */}
-                  <button className="w-full flex items-center py-2 px-3 rounded-lg bg-[#181818] text-sm text-white hover:bg-[#242424] transition-colors duration-300 border border-gray-800 h-10">
-                    <Mail size={16} className="mr-3" />
-                    Continue with Email
-                  </button>
-                </div>
-
-                <div
-                  className="relative flex justify-center text-sm"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "20px",
-                  }}
-                >
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-800"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm mt-[15px] mb-[25px]">
-                    <span className="px-4 bg-[#101010] text-gray-500 uppercase font-medium">OR</span>
+                  {/* Email section label */}
+                  <div className="relative flex justify-center text-sm mt-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-4 bg-[#101010] text-gray-500 uppercase font-medium">
+                        OU
+                      </span>
+                    </div>
                   </div>
                 </div>
               </>
             )}
 
-            {formType === "register" && <RegistrationForm onLoginClick={() => toggleForm("login")} />}
-            {formType === "login" && <LoginForm />}
-            {formType === "forgotPassword" && <ForgotPasswordForm />}
+            {formType === "register" && (
+              <RegistrationForm
+                onLoginClick={() => toggleForm("login")}
+                onRegister={handleEmailSignUp}
+              />
+            )}
+
+            {formType === "login" && <LoginForm onLogin={handleEmailSignIn} />}
+
+            {formType === "forgotPassword" && (
+              <ForgotPasswordForm onPasswordReset={handlePasswordReset} />
+            )}
 
             <div className="mt-4 text-center text-sm text-gray-400">
               {formType === "register" && (
@@ -171,7 +292,10 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
                 </div>
               )}
               {formType === "forgotPassword" && (
-                <button onClick={() => toggleForm("login")} className="font-medium text-[#b157ff] hover:text-[#9645d8]">
+                <button
+                  onClick={() => toggleForm("login")}
+                  className="font-medium text-[#b157ff] hover:text-[#9645d8]"
+                >
                   <T id="forgotPassword.backToLogin" />
                 </button>
               )}
@@ -180,7 +304,10 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
         </div>
 
         {/* Right side - Image */}
-        <div className="hidden md:block w-1/2 relative" style={{ minHeight: "680px" }}>
+        <div
+          className="hidden md:block w-1/2 relative"
+          style={{ minHeight: "680px" }}
+        >
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/background-sing-up.jpg-DEUJ6DDQIqaCJuNseZQpZil211NvKj.jpeg"
             alt="Fantasy castle with lightning"
@@ -188,10 +315,10 @@ export default function RegistrationPopup({ onClose }: RegistrationPopupProps) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/20" /> {/* Subtle overlay */}
+          <div className="absolute inset-0 bg-black/20" />{" "}
+          {/* Subtle overlay */}
         </div>
       </div>
     </div>
-  )
+  );
 }
-
