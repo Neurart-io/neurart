@@ -27,30 +27,30 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
+  // useEffect(() => {
+  //   const checkUser = async () => {
+  //     try {
+  //       const { data, error } = await supabase.auth.getUser();
 
-        console.log("data", data);
+  //       console.log("data", data);
 
-        if (data.user) {
-          console.log("redirecting to /gerar-imagens");
-          router.push("/gerar-imagem");
-        }
-      } catch (err) {
-        console.error("Erro ao verificar autenticação:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    checkUser();
-  }, [router, supabase.auth]);
+  //       if (data.user) {
+  //         console.log("redirecting to /gerar-imagens");
+  //         router.push("/gerar-imagem");
+  //       }
+  //     } catch (err) {
+  //       console.error("Erro ao verificar autenticação:", err);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+  //   checkUser();
+  // }, [router, supabase.auth]);
 
   useScrollToTop();
 

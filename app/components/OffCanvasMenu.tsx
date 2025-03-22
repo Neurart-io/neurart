@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react";
 import { useLocalization } from "../contexts/LocalizationContext";
 import { T } from "./T";
+import Image from "next/image";
 
 interface OffCanvasMenuProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export default function OffCanvasMenu({
   onLogout,
   user,
 }: OffCanvasMenuProps) {
+  console.log(user);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -35,6 +38,21 @@ export default function OffCanvasMenu({
 
   const { language } = useLocalization();
 
+  const getUserInitial = () => {
+    if (user && user.email && user.email.length > 0) {
+      return user.email[0].toUpperCase();
+    }
+    return "U";
+  };
+
+  const hasAvatar =
+    user &&
+    user.user_metadata &&
+    user.user_metadata.avatar_url &&
+    user.user_metadata.avatar_url.length > 0;
+
+  const avatarUrl = hasAvatar ? user.user_metadata.avatar_url : null;
+
   if (!isOpen) return null;
 
   return (
@@ -44,14 +62,28 @@ export default function OffCanvasMenu({
         {/* User Profile Section */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-[#2478ff] rounded-full flex items-center justify-center">
-              <span className="text-white font-medium">V</span>
-            </div>
+            {avatarUrl ? (
+              <div className="w-8 h-8 rounded-full overflow-hidden">
+                <Image
+                  src={avatarUrl}
+                  alt="User avatar"
+                  width={32}
+                  height={32}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            ) : (
+              <div className="w-8 h-8 bg-[#2478ff] rounded-full flex items-center justify-center">
+                <span className="text-white font-medium">
+                  {getUserInitial()}
+                </span>
+              </div>
+            )}
             <div className="flex-1">
               <div className="text-sm font-medium text-white">
                 Hi, Neurarter
               </div>
-              <div className="text-xs text-gray-400">{user.email}</div>
+              <div className="text-xs text-gray-400">{user?.email || ""}</div>
             </div>
           </div>
         </div>
