@@ -1,34 +1,59 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Link from "next/link"
-import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react"
-import { useLocalization } from "../contexts/LocalizationContext"
-import { T } from "./T"
+import { useEffect } from "react";
+import Link from "next/link";
+import { LogOut, CreditCard, Settings, BookOpen } from "lucide-react";
+import { useLocalization } from "../contexts/LocalizationContext";
+import { T } from "./T";
+import Image from "next/image";
 
 interface OffCanvasMenuProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  onLogout: () => void;
+  user: any;
 }
 
-export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
+export default function OffCanvasMenu({
+  isOpen,
+  onClose,
+  onLogout,
+  user,
+}: OffCanvasMenuProps) {
+  console.log(user);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
+      if (e.key === "Escape") onClose();
+    };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape)
+      document.addEventListener("keydown", handleEscape);
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape)
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  const { language } = useLocalization();
+
+  const getUserInitial = () => {
+    if (user && user.email && user.email.length > 0) {
+      return user.email[0].toUpperCase();
     }
-  }, [isOpen, onClose])
+    return "U";
+  };
 
-  const { language } = useLocalization()
+  const hasAvatar =
+    user &&
+    user.user_metadata &&
+    user.user_metadata.avatar_url &&
+    user.user_metadata.avatar_url.length > 0;
 
-  if (!isOpen) return null
+  const avatarUrl = hasAvatar ? user.user_metadata.avatar_url : null;
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -37,12 +62,28 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
         {/* User Profile Section */}
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-[#2478ff] rounded-full flex items-center justify-center">
-              <span className="text-white font-medium">V</span>
-            </div>
+            {avatarUrl ? (
+              <div className="w-8 h-8 rounded-full overflow-hidden">
+                <Image
+                  src={avatarUrl}
+                  alt="User avatar"
+                  width={32}
+                  height={32}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            ) : (
+              <div className="w-8 h-8 bg-[#2478ff] rounded-full flex items-center justify-center">
+                <span className="text-white font-medium">
+                  {getUserInitial()}
+                </span>
+              </div>
+            )}
             <div className="flex-1">
-              <div className="text-sm font-medium text-white">Hi, Neurarter</div>
-              <div className="text-xs text-gray-400">viogoss@hotmail.com</div>
+              <div className="text-sm font-medium text-white">
+                Hi, Neurarter
+              </div>
+              <div className="text-xs text-gray-400">{user?.email || ""}</div>
             </div>
           </div>
         </div>
@@ -75,13 +116,14 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
           >
             <BookOpen size={18} className="text-gray-400" />
-            <span className="text-sm text-gray-200">{language === "pt" ? "Aprendizagem" : "Learning"}</span>
+            <span className="text-sm text-gray-200">
+              {language === "pt" ? "Aprendizagem" : "Learning"}
+            </span>
           </Link>
 
           <button
             onClick={() => {
-              // Handle logout
-              console.log("Logging out...")
+              onLogout();
             }}
             className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-red-400"
           >
@@ -96,6 +138,5 @@ export default function OffCanvasMenu({ isOpen, onClose }: OffCanvasMenuProps) {
         <div className="p-2 border-t border-gray-800 mt-2"></div>
       </div>
     </div>
-  )
+  );
 }
-

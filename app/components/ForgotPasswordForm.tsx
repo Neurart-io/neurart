@@ -1,39 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { T } from "./T"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { T } from "./T";
 
-export default function ForgotPasswordForm() {
-  const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isFormStarted, setIsFormStarted] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+interface ForgotPasswordFormProps {
+  onPasswordReset: (email: string) => Promise<boolean>;
+}
+
+export default function ForgotPasswordForm({
+  onPasswordReset,
+}: ForgotPasswordFormProps) {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFormStarted, setIsFormStarted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
-    setIsFormStarted(email.trim() !== "")
-  }, [email])
+    setIsFormStarted(email.trim() !== "");
+  }, [email]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Simple validation
     if (!email) {
-      setError("Please enter your email address")
-      setIsLoading(false)
-      return
+      setError("Please enter your email address");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate password reset process
-    setTimeout(() => {
-      setIsLoading(false)
-      setIsSubmitted(true)
-      // Handle password reset request
-    }, 1500)
-  }
+    try {
+      await onPasswordReset(email);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isSubmitted) {
     return (
@@ -42,13 +47,15 @@ export default function ForgotPasswordForm() {
           <T id="forgotPassword.successMessage" />
         </p>
       </div>
-    )
+    );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       {error && (
-        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">{error}</div>
+        <div className="mb-4 p-2 bg-red-900/50 border border-red-700 rounded-md text-white text-sm">
+          {error}
+        </div>
       )}
       <div>
         <input
@@ -70,8 +77,8 @@ export default function ForgotPasswordForm() {
             isLoading
               ? "opacity-70 cursor-not-allowed bg-[#181818] text-white border-gray-700"
               : isFormStarted
-                ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
-                : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
+              ? "bg-[#b157ff] text-white border-transparent hover:bg-[#9645d8] hover:shadow-[0_0_15px_rgba(177,87,255,0.5)] hover:blur-[0.5px]"
+              : "bg-[#181818] text-white border-gray-700 hover:bg-[#242424]"
           }`}
         >
           {isLoading ? (
@@ -82,7 +89,14 @@ export default function ForgotPasswordForm() {
                 fill="none"
                 viewBox="0 0 24 24"
               >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
                 <path
                   className="opacity-75"
                   fill="currentColor"
@@ -97,6 +111,5 @@ export default function ForgotPasswordForm() {
         </button>
       </div>
     </form>
-  )
+  );
 }
-
