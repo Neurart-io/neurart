@@ -47,25 +47,16 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("user", user);
-  console.log("request.nextUrl.pathname", request.nextUrl.pathname);
-
   const { pathname } = request.nextUrl;
 
-  // Verificar se a rota atual está na lista de rotas públicas
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
-    return supabaseResponse;
-  }
-
-  if (
-    !user &&
-    !pathname.startsWith("/login") &&
-    !pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  if (!user && !pathname.startsWith("/login")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+    return supabaseResponse;
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
